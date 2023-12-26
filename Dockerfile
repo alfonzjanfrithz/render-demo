@@ -1,11 +1,17 @@
-# Use the official nginx image as a base
-FROM nginx:latest
+# Start with a base image containing Java runtime (Java 17 in this case)
+FROM openjdk:17
 
-# Copy the static HTML files into the nginx container
-COPY ./*.html /usr/share/nginx/html/
+# Add a volume pointing to /tmp
+VOLUME /tmp
 
-# Expose port 80
-EXPOSE 80
+# Make port 8080 available to the world outside this container
+EXPOSE 8080
 
-# Start Nginx and keep it running in the foreground
-CMD ["nginx", "-g", "daemon off;"]
+# The application's jar file
+ARG JAR_FILE=target/movie-demo-0.0.1-SNAPSHOT.jar
+
+# Add the application's jar to the container
+ADD ${JAR_FILE} app.jar
+
+# Run the jar file
+ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar"]
